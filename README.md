@@ -12,6 +12,7 @@ Script which automatically generates gitbm localization by using the minecraft l
 - `--mcversion` - minecraft version
 - `--location` - root .minecraft directory (default: $HOME/.minecraft)
 - `--out` - out directory (default: ./out)
+- `--template` - template location (default: ../../template/lang.json)
 
 ## Languages
 | :heavy_check_mark: | :white_check_mark: | :heavy_multiplication_x: |

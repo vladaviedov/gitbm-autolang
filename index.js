@@ -16,12 +16,13 @@ const nthIndexOf = (string, substr, n) => {
 };
 
 let location = `${os.homedir()}/.minecraft`;
+let templateFile = "../../template/lang.json"
 let lang = undefined;
 let mcversion = undefined;
 let outDir = "./out";
 
 // Parse arguments
-const argv = minimist(process.argv.slice(2));
+const argv = minimist(process.argv.slice(2), { string: "mcversion" });
 for (const arg in argv) {
 	switch (arg) {
 		case "location":
@@ -36,6 +37,9 @@ for (const arg in argv) {
 		case "out":
 			outDir = argv[arg];
 			break;
+		case "template":
+			templateFile = argv[arg];
+			break;
 		case "_":
 			break;
 		default:
@@ -45,13 +49,22 @@ for (const arg in argv) {
 }
 
 // Check arguments
-if (lang == undefined)
+if (lang == undefined) {
 	fatal("Error: 'lang' must be specified");
-if (mcversion == undefined)
+}
+if (mcversion == undefined) {
 	fatal("Error: 'mcversion' must be specified");
+}
 
 // Get indexes file
-const indexesPath = `${location}/assets/indexes/${mcversion}.json`;
+let indexesPath;
+if (mcversion == "1.20") {
+	// 1.20 Exception
+	indexesPath = `${location}/assets/indexes/5.json`;
+} else {
+	indexesPath = `${location}/assets/indexes/${mcversion}.json`;
+}
+
 let indexes;
 try {
 	indexes = JSON.parse(fs.readFileSync(indexesPath, "utf-8"));
@@ -62,8 +75,9 @@ try {
 // Obtain lang file hash
 const langIndexKey = `minecraft/lang/${lang}.json`;
 const langEntry = indexes["objects"][langIndexKey];
-if (langEntry == undefined)
+if (langEntry == undefined) {
 	fatal("Error: language not listed in indexes");
+}
 const langHash = langEntry["hash"];
 
 // Get lang file
@@ -76,7 +90,7 @@ try {
 }
 
 // Load lang file template
-const langTemplate = JSON.parse(fs.readFileSync("../../template/lang.json"));
+const langTemplate = JSON.parse(fs.readFileSync(templateFile));
 
 // Create item name template
 const bucketOfEnt = langFile["item.minecraft.pufferfish_bucket"];
@@ -84,7 +98,11 @@ const ent = langFile["entity.minecraft.pufferfish"];
 const nameTemplate = bucketOfEnt.replace(new RegExp(ent, "i"), "%");
 
 // Generate item names
-const localizedFile = { "_comment": `Auto-generated localization for ${lang}; mcversion: ${mcversion}` };
+const localizedFile = {
+	"_comment": `Auto-generated localization for ${lang}`,
+	"_mcversion": mcversion,
+	"_date": new Date().toISOString()
+};
 for (let entry in langTemplate) {
 	const name = entry.substring(nthIndexOf(entry, "_", 2) + 1);
 	const entity = langFile[`entity.minecraft.${name}`];
@@ -95,7 +113,8 @@ for (let entry in langTemplate) {
 
 // Write to file
 const outFile = `${outDir}/${lang}.json`;
-if (!fs.existsSync(outDir))
+if (!fs.existsSync(outDir)) {
 	fs.mkdirSync(outDir);
+}
 fs.writeFileSync(outFile, JSON.stringify(localizedFile, null, 4) + "\n", "utf-8");
 console.log(`Generated locale for ${lang}. Output file: ${outFile}`);
