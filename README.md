@@ -22,9 +22,11 @@ Script which automatically generates gitbm localization by using the minecraft l
 - `en_gb` :heavy_check_mark:
 - `ru_ru` :heavy_check_mark:
 - `zh_cn` :heavy_check_mark:
+- `zh_tw` :white_check_mark:
 - `ja_jp` :white_check_mark:
 - `fr_fr` :white_check_mark:
 - `es_es` :white_check_mark:
+- `de_de` :white_check_mark:
 - `uk_ua` :heavy_multiplication_x: (grammar: з/із/зі)
 
 ## Notes
